@@ -1,0 +1,11 @@
+Player Start Position
+280 380
+
+Walls
+250 150 100 100
+0 0 0 0
+
+Enemies
+50 50
+300 50
+550 50

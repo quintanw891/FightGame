@@ -26,7 +26,10 @@ public class Player extends Being {
 		invulnerable = true;
 	}
 	
-	public void shoot(Level l){
-		
+	public void shoot(Projectile p){
+		p.facing = facing;
+		p.x = x+3;
+		p.y = y+3;
+		p.fired = true;
 	}
 }

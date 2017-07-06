@@ -10,6 +10,7 @@ public class Enemy extends Being{
 	public final int REST_DURATION = 60;
 	private int strength;
 	public boolean resting = false;
+	public boolean alive = true;
 	
 	public Enemy(int x, int y){
 		super();
@@ -122,6 +123,10 @@ public class Enemy extends Being{
 			player.suffer(strength);
 			resting = true;
 		}
+	}
+
+	public void suffer(int damage) {
+		hp -= damage;
 	}
 
 }

@@ -20,6 +20,7 @@ public class GamePanel extends JPanel {
 	public int levelNum;
 	public Level level;
 	public Player player = new Player();
+	public Projectile projectile = new Projectile();
 	public Color lightRed = new Color(225, 48, 48);
 	public Color brown = new Color(94, 48, 0);
 	
@@ -104,6 +105,8 @@ public class GamePanel extends JPanel {
 				setBackground(lightRed);
 				g.setColor(Color.YELLOW);
 				g.fillRect(player.x, player.y, player.width, player.height);
+				if(projectile.fired)
+					g.fillRect(projectile.x,projectile.y,projectile.width,projectile.height);
 				g.setColor(Color.CYAN);
 				Enemy[] enemies = level.getEnemies();
 				for(int i=0; i<enemies.length; i++){
@@ -116,14 +119,22 @@ public class GamePanel extends JPanel {
 				}
 				
 				//move the player & set player's direction to the four cardinal directions
-				if(up)
+				if(up){
+					player.facing = (Direction.UP);
 					player.moveUp(level);
-				if(down)
+				}
+				if(down){
+					player.facing = (Direction.DOWN);
 					player.moveDown(level);
-				if(left)
+				}
+				if(left){
+					player.facing = (Direction.LEFT);
 					player.moveLeft(level);
-				if(right)
+				}
+				if(right){
+					player.facing = (Direction.RIGHT);
 					player.moveRight(level);
+				}
 				
 				//set player's direction to diagonals
 				if(up && right)
@@ -145,9 +156,19 @@ public class GamePanel extends JPanel {
 				}
 				
 				//fire projectiles
-				if(space)
-					player.shoot(level);
-				
+				if(space && !projectile.fired){
+					player.shoot(projectile);
+				}
+				if(projectile.fired){
+					if(!projectile.fly(level)){//if the projectile hit something
+						for(int i=0; i<enemies.length; i++){
+							if(projectile.isTouching(enemies[i])){
+								projectile.hit(enemies[i]);
+							}
+						}
+						projectile.fired = false;
+					}
+				}
 				//move the enemies
 				for(int i=0; i<enemies.length; i++){
 					if(enemies[i].resting){
@@ -157,11 +178,15 @@ public class GamePanel extends JPanel {
 							enemies[i].resting = false;
 						}
 					}else{
-						enemies[i].animate(player, level);
-						if(enemies[i].isTouching(player))
-							enemies[i].attack(player);
+						if(enemies[i].alive){
+							enemies[i].animate(player, level);
+							if(enemies[i].isTouching(player))
+								enemies[i].attack(player);
+						}
 					}
 				}
+				//check for player/enemy death
+				//TODO first fix player/enemy/projectile speed then do this stuff
 				
 			}else{//run inter-level processes
 				if(loading){//load the next level

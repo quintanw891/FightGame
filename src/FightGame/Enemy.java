@@ -4,8 +4,8 @@ import java.util.Random;
 
 public class Enemy extends Being{
 	
-	private int movementTimer;
-	private final int MOVEMENT_INTERVAL = 60;
+	private int movementTimer = 0;
+	private int movementInterval = 50;
 	public int restTimer;
 	public final int REST_DURATION = 60;
 	private int strength;
@@ -16,10 +16,12 @@ public class Enemy extends Being{
 		super();
 		this.x = x;
 		this.y = y;
-		movementTimer = 0;
+		maxHp = 10;
+		hp = maxHp;
 		restTimer = 0;
 		strength = 5;
 		facing = randomDirection();
+		speed = new Speed(2);
 	}
 
 	private Direction randomDirection(){
@@ -48,8 +50,7 @@ public class Enemy extends Being{
 	}
 
 	public void animate(Player p, Level l){
-		//move enemies at 2/3 speed of player
-		if(movementTimer % 4 != 0){
+		if(movementTimer != movementInterval){
 			//when in range of player, chase the player
 			if(Math.abs(p.x - x) < 150 && Math.abs(p.y - y) < 150)
 				chase(p,l);
@@ -82,11 +83,10 @@ public class Enemy extends Being{
 				moveUp(l);
 				moveLeft(l);
 			}
-		}
-		movementTimer++;
-		if(movementTimer == MOVEMENT_INTERVAL){
-			movementTimer = 0;
+			movementTimer++;
+		}else{
 			facing = randomDirection();
+			movementTimer = 0;
 		}
 	}
 	

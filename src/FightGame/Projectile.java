@@ -9,8 +9,9 @@ public class Projectile extends Movable {
 	
 	public Projectile(){
 		this.setSize(10,10);
-		power = 10;
+		power = 5;
 		fired = false;
+		speed = new Speed(5);
 	}
 	
 	public boolean fly(Level l){

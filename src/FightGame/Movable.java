@@ -1,16 +1,18 @@
 package FightGame;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 public class Movable extends Rectangle {
 	protected Direction facing;
-
+	public Speed speed;
+	
 	public boolean moveUp(Level level) {
 		boolean upBound = false;
-		if(y==0)
+		if(y==level.getHudLength())
 			upBound = true;
 		Rectangle[] walls = level.getWalls();
-		Enemy[] enemies = level.getEnemies();
+		Enemy[] enemies = level.getAliveEnemies();
 		Player[] player = level.getPlayer();
 		if(isBelow(walls) || isBelow(enemies) || isBelow(player))
 			upBound = true;
@@ -29,10 +31,10 @@ public class Movable extends Rectangle {
 
 	public boolean moveDown(Level level) {
 		boolean downBound = false;
-		if(y==400-height)
+		if(y==400+level.getHudLength()-height)
 			downBound = true;
 		Rectangle[] walls = level.getWalls();
-		Enemy[] enemies = level.getEnemies();
+		Enemy[] enemies = level.getAliveEnemies();
 		Player[] player = level.getPlayer();
 		if(isAbove(walls) || isAbove(enemies) || isAbove(player))
 			downBound = true;
@@ -54,7 +56,7 @@ public class Movable extends Rectangle {
 		if(x==0)
 			leftBound = true;
 		Rectangle[] walls = level.getWalls();
-		Enemy[] enemies = level.getEnemies();
+		Enemy[] enemies = level.getAliveEnemies();
 		Player[] player = level.getPlayer();
 		if(isRightOf(walls) || isRightOf(enemies) || isRightOf(player))
 			leftBound = true;
@@ -76,7 +78,7 @@ public class Movable extends Rectangle {
 		if(x==600-width)
 			rightBound = true;
 		Rectangle[] walls = level.getWalls();
-		Enemy[] enemies = level.getEnemies();
+		Enemy[] enemies = level.getAliveEnemies();
 		Player[] player = level.getPlayer();
 		if(isLeftOf(walls) || isLeftOf(enemies) || isLeftOf(player))
 			rightBound = true;
@@ -93,10 +95,16 @@ public class Movable extends Rectangle {
 		return false;
 	}
 	
-	public boolean isTouching(Being theBeing){
+	public boolean isTouching(Rectangle thing){
 		Rectangle[] b = new Rectangle[1];
-		b[0] = theBeing;
+		b[0] = thing;
 		if(isAbove(b) || isBelow(b) || isRightOf(b) || isLeftOf(b))
+			return true;
+		return false;
+	}
+	
+	public boolean onBorder(Level level){
+		if(x == 0 || y == level.getHudLength() || x+width == 600 || y+height == 400+level.getHudLength())
 			return true;
 		return false;
 	}

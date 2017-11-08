@@ -10,16 +10,17 @@ import javax.swing.*;
 public class GamePanel extends JPanel {
 	//declare game values
 	//flags recording the state of the game
-	public boolean start, inLevel, loading, gameOver = false;
+	public boolean start, inLevel, loading, gameOver, gameWon = false;
 	//menu items
 	public Rectangle titleBox, titleBorder, messageBox, messageBorder;
 	//player input
-	public boolean up, down, left, right, enter, space = false;
+	public boolean up, down, left, right, enter, space, attackButtonHeld, teleportButtonHeld = false;
 	//hud items
 	public final int HUD_LENGTH = 30;
 	public Rectangle lifeMeter, lifeBar;
 	//level related values
 	public String levelFilename;
+	public final int NUMBER_OF_LEVELS = 2;
 	public int levelNum;
 	public Level level;
 	public Player player = new Player();
@@ -78,15 +79,18 @@ public class GamePanel extends JPanel {
 			g.fillRect(messageBox.x,messageBox.y,messageBox.width,messageBox.height);
 			g.fillRect(messageBox.x,messageBox.y + 35,messageBox.width,messageBox.height);
 			g.fillRect(messageBox.x,messageBox.y + 70,messageBox.width,messageBox.height);
+			g.fillRect(messageBox.x,messageBox.y + 105,messageBox.width,messageBox.height);
 			g.setColor(Color.WHITE);
 			g.drawString("Fight Game", titleBorder.x + 2, titleBorder.y + 15);
 			g.drawString("  Defeat all enemies to proceed.", messageBorder.x + 2, messageBorder.y + 15);
-			g.drawString("   W,A,S,D to move. UP to attack.", messageBorder.x + 2, messageBorder.y + 50);
-			g.drawString("         Press ENTER to start!", messageBorder.x + 2, messageBorder.y + 85);
+			g.drawString(" W,A,S,D to move. SPACE to fire.", messageBorder.x + 2, messageBorder.y + 50);
+			g.drawString("      SPACE again to teleport.", messageBorder.x + 2, messageBorder.y + 85);
+			g.drawString("         Press ENTER to start!", messageBorder.x + 2, messageBorder.y + 120);
 			g.drawRect(titleBorder.x,titleBorder.y,titleBorder.width,titleBorder.height);
 			g.drawRect(messageBorder.x,messageBorder.y,messageBorder.width,messageBorder.height);
 			g.drawRect(messageBorder.x,messageBorder.y + 35,messageBorder.width,messageBorder.height);
 			g.drawRect(messageBorder.x,messageBorder.y + 70,messageBorder.width,messageBorder.height);
+			g.drawRect(messageBorder.x,messageBorder.y + 105,messageBorder.width,messageBorder.height);
 			//begin the game when enter is pressed
 			if(enter){
 				System.out.println("home -> load");
@@ -177,8 +181,9 @@ public class GamePanel extends JPanel {
 				}
 				
 				//fire projectiles
-				if(space && !projectile.fired){
+				if(space && !projectile.fired && !player.inAttackCooldown && !teleportButtonHeld){
 					player.shoot(projectile);
+					attackButtonHeld = true;
 				}
 				if(projectile.fired){
 					if(timer % (6 - projectile.speed.value) == 0){//only execute movement sometimes based on projectile speed
@@ -199,6 +204,38 @@ public class GamePanel extends JPanel {
 					}
 					if(projectile.onBorder(level))
 						projectile.fired = false;
+					//teleport functionality
+					if(space && !player.inTeleportCooldown && !attackButtonHeld){
+						if(player.teleportTo(projectile, level)){
+							projectile.fired = false;
+							teleportButtonHeld = true;
+						}
+					}
+				}
+				if(attackButtonHeld){
+					if(!space){
+						attackButtonHeld = false;
+					}
+				}
+				if(teleportButtonHeld){
+					if(!space){
+						teleportButtonHeld = false;
+					}
+				}
+				//manage cooldowns
+				if(player.inAttackCooldown){
+					player.attackCooldownTimer++;
+					if(player.attackCooldownTimer == player.ATTACK_COOLDOWN_DURATION){
+						player.inAttackCooldown = false;
+						player.attackCooldownTimer = 0;
+					}
+				}
+				if(player.inTeleportCooldown){
+					player.teleportCooldownTimer++;
+					if(player.teleportCooldownTimer == player.TELEPORT_COOLDOWN_DURATION){
+						player.inTeleportCooldown = false;
+						player.teleportCooldownTimer = 0;
+					}
 				}
 				//move the enemies
 				for(int i=0; i<enemies.length; i++){
@@ -224,6 +261,7 @@ public class GamePanel extends JPanel {
 				}
 				if(player.hp <= 0){
 					player.die();
+					projectile.fired = false;
 					if(player.getLives() > 0){
 						player.goToStart();
 						for(int i=0; i<enemies.length; i++){
@@ -236,6 +274,17 @@ public class GamePanel extends JPanel {
 						inLevel = false;
 						gameOver = true;
 					}
+				}
+				boolean enemiesRemaining = false;
+				for(int i=0;i<enemies.length;i++){
+					if(enemies[i].alive){
+						enemiesRemaining = true;
+					}
+				}
+				if(enemiesRemaining == false){
+					inLevel = false;
+					if(levelNum == NUMBER_OF_LEVELS)
+						gameWon = true;
 				}
 				
 				timer++;
@@ -324,8 +373,8 @@ public class GamePanel extends JPanel {
 					player.goToStart();
 					loading = false;
 					inLevel = true;
-				}else{//display inter-level message
-					if(gameOver){
+				}else{//functionality between or after levels
+					if(gameOver){//when the player has lost display game over message and offer restart
 						g.setColor(Color.BLACK);
 						g.fillRect(titleBox.x,titleBox.y,titleBox.width,titleBox.height);
 						g.fillRect(messageBox.x,messageBox.y,messageBox.width,messageBox.height);
@@ -339,6 +388,41 @@ public class GamePanel extends JPanel {
 							player.setLives(3);
 							player.hp = player.maxHp;
 							gameOver = false;
+							loading = true;
+						}
+					}
+					else if(gameWon){//when the player has won display winning message and offer restart
+						g.setColor(Color.BLACK);
+						g.fillRect(titleBox.x,titleBox.y,titleBox.width,titleBox.height);
+						g.fillRect(messageBox.x,messageBox.y,messageBox.width,messageBox.height);
+						g.fillRect(messageBox.x,messageBox.y + 35,messageBox.width,messageBox.height);
+						g.setColor(Color.WHITE);
+						g.drawString("   You Win", titleBorder.x + 2, titleBorder.y + 15);
+						g.drawString("           Thanks for playing.", messageBorder.x + 2, messageBorder.y + 15);
+						g.drawString("         Press Enter to Restart.", messageBorder.x + 2, messageBorder.y + 50);
+						g.drawRect(titleBorder.x,titleBorder.y,titleBorder.width,titleBorder.height);
+						g.drawRect(messageBorder.x,messageBorder.y,messageBorder.width,messageBorder.height);
+						g.drawRect(messageBorder.x,messageBorder.y + 35,messageBorder.width,messageBorder.height);
+						if(enter){
+							levelNum = 1;
+							player.setLives(3);
+							player.hp = player.maxHp;
+							gameWon = false;
+							loading = true;
+						}
+					}
+					else{//when the player has finished a level that is not the last level
+						g.setColor(Color.BLACK);
+						g.fillRect(titleBox.x,titleBox.y,titleBox.width,titleBox.height);
+						g.fillRect(messageBox.x,messageBox.y,messageBox.width,messageBox.height);
+						g.setColor(Color.WHITE);
+						g.drawString("   All Clear", titleBorder.x + 2, titleBorder.y + 15);
+						g.drawString("        Press Enter to proceed.", messageBorder.x + 2, messageBorder.y + 15);
+						g.drawRect(titleBorder.x,titleBorder.y,titleBorder.width,titleBorder.height);
+						g.drawRect(messageBorder.x,messageBorder.y,messageBorder.width,messageBorder.height);
+						if(enter){
+							levelNum++;
+							player.hp = player.maxHp;
 							loading = true;
 						}
 					}

@@ -8,10 +8,8 @@ public class Client extends JFrame{
 	public Client(){
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLocationRelativeTo(null);
 		setBackground(Color.black);
 		setTitle("Fight Game");
-		setVisible(true);
 	}
 	
 	public static void main(String[] args) {
@@ -19,6 +17,8 @@ public class Client extends JFrame{
 		GamePanel p = new GamePanel(frame);
 		frame.add(p);
 		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
 	}
 
 }

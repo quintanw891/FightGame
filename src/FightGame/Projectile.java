@@ -2,6 +2,12 @@ package FightGame;
 
 import java.awt.Rectangle;
 
+/**
+ * The Projectile Object
+ * This class represents the projectile that the player can fire to damage
+ * enemies or be used for teleportation.
+ * @author William Quintano
+ */
 public class Projectile extends Movable {
 	
 	public boolean fired;
@@ -14,6 +20,12 @@ public class Projectile extends Movable {
 		speed = new Speed(5);
 	}
 	
+	/**
+	 * Moves the projectile in the direction that it is facing if possible.
+	 * @param l the level that the projectile is in.
+	 * @return true if the movement was successful, false if the projectile
+	 * hit something.
+	 */
 	public boolean fly(Level l){
 		switch(facing){
 		case UP:
@@ -36,6 +48,11 @@ public class Projectile extends Movable {
 		return false;
 	}
 
+	/**
+	 * Inflicts damage on an enemy. This method is called when the projectile
+	 * contacts an enemy.
+	 * @param enemy the enemy that the projectile damages.
+	 */
 	public void hit(Enemy enemy) {
 		enemy.suffer(power);
 	}

@@ -2,6 +2,11 @@ package FightGame;
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * The Client Object
+ * This class serves to create the interface that will run the fight game.
+ * @author William Quintano
+ */
 @SuppressWarnings("serial")
 public class Client extends JFrame{
 

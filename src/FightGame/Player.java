@@ -3,6 +3,14 @@ package FightGame;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+/**
+ * The Fight Game Player Object
+ * This class represents the character that the user controls in the FightGame.
+ * A player object contains values relating to its state and can shoot
+ * projectiles, teleport to the fired projectiles, and damage enemies.
+ * @author William Quintano
+ *
+ */
 public class Player extends Being {
 
 	public boolean invulnerable, shooting, inAttackCooldown, inTeleportCooldown;
@@ -26,11 +34,19 @@ public class Player extends Being {
 		lives = 3;
 	}
 	
+	/**
+	 * Inflicts a specified amount of damage on the player.
+	 * @param damage the amount of damage the player takes.
+	 */
 	public void suffer(int damage){
 		hp -= damage;
 		invulnerable = true;
 	}
 	
+	/**
+	 * Shoots a projectile in the direction that the player is facing.
+	 * @param p the projectile that the player shoots.
+	 */
 	public void shoot(Projectile p){
 		p.facing = facing;
 		p.x = x+(width/2)-(p.width/2);
@@ -39,19 +55,39 @@ public class Player extends Being {
 		inAttackCooldown = true;
 	}
 
+	/**
+	 * decrements the players lives and resets their hp
+	 */
 	public void die() {
 		lives--;
 		hp = maxHp;
 	}
 
+	/**
+	 * @return the current amount of lives the player has left
+	 */
 	public int getLives(){
 		return lives;
 	}
 
+	/**
+	 * Sets the players amount of lives to a specified quantity
+	 * @param l the number of lives the player will have
+	 */
 	public void setLives(int l) {
 		lives = l;
 	}
 
+	/**
+	 * Teleports the player to the position of a fired projectile if possible. If 
+	 * there is enough room for the player to spawn at the projectile's position,
+	 * then the player will instantly move to that location and the projectile will
+	 * be destroyed. Otherwise the player will not move and the projectile will
+	 * continue on its path.
+	 * @param p the projectile to teleport to.
+	 * @param l the level that the player and projectile are in.
+	 * @return true if the teleport was successful, false there was not enough room.
+	 */
 	public boolean teleportTo(Projectile p, Level l) {
 		Rectangle landingZone = new Rectangle(p.x+(p.width/2)-(width/2),p.y+(p.height/2)-(height/2),width,height);
 		Rectangle[] walls = l.getWalls();

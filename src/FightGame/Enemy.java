@@ -1,7 +1,16 @@
 package FightGame;
 
 import java.util.Random;
+import java.awt.Rectangle;
 
+/**
+ * The Fight Game Enemy Object
+ * This class represents an enemy that the player encounters in the fight game.
+ * An enemy object holds values relating to their state and movement patterns.
+ * An enemy object can wander the level randomly, chase the player, attack the
+ * player, and take damage.
+ * @author William Quintano
+ */
 public class Enemy extends Being{
 	
 	private int movementTimer = 0;
@@ -11,6 +20,7 @@ public class Enemy extends Being{
 	private int strength;
 	public boolean resting = false;
 	public boolean alive = true;
+	//private Rectangle[] zone;
 	
 	public Enemy(int x, int y){
 		super();
@@ -24,6 +34,10 @@ public class Enemy extends Being{
 		speed = new Speed(2);
 	}
 
+	/**
+	 * Sets the enemy's direction to one of eight directions randomly.
+	 * @return the direction that the enemy now faces
+	 */
 	private Direction randomDirection(){
 		Direction direction = null;
 		Random r = new Random();
@@ -49,6 +63,13 @@ public class Enemy extends Being{
 		return direction;
 	}
 
+	/**
+	 * Reacts to the environment of the enemy. If the player is within range
+	 * of the enemy, the reaction is to chase the player. Otherwise, the
+	 * reaction is to wander the level.
+	 * @param p the player that the enemy can react to
+	 * @param l the level the enemy is in
+	 */
 	public void animate(Player p, Level l){
 		if(movementTimer != movementInterval){
 			//when in range of player, chase the player
@@ -90,6 +111,11 @@ public class Enemy extends Being{
 		}
 	}
 	
+	/**
+	 * Moves the enemy toward the player's position
+	 * @param p the player the enemy is chasing
+	 * @param l the level that the enemy and player are in
+	 */
 	private void chase(Player p, Level l){
 		int xDistance = p.x - x;
 		int yDistance = y - p.y;
@@ -118,6 +144,10 @@ public class Enemy extends Being{
 		
 	}
 	
+	/**
+	 * Inflicts damage on the player
+	 * @param player the player to damage
+	 */
 	public void attack(Player player) {
 		if(!player.invulnerable){
 			player.suffer(strength);
@@ -125,6 +155,10 @@ public class Enemy extends Being{
 		}
 	}
 
+	/**
+	 * Inflicts damage on the enemy
+	 * @param damage the amount of damage that the enemy takes
+	 */
 	public void suffer(int damage) {
 		hp -= damage;
 	}

@@ -6,6 +6,12 @@ import java.util.*;
 
 import javax.swing.*;
 
+/**
+ * The GamePanel Object
+ * This class represents the interface on which the fight game is displayed
+ * A GamePanel object runs the fight game and responds to user input.
+ * @author William Quintano
+ */
 @SuppressWarnings("serial")
 public class GamePanel extends JPanel {
 	//declare game values
@@ -20,7 +26,7 @@ public class GamePanel extends JPanel {
 	public Rectangle lifeMeter, lifeBar;
 	//level related values
 	public String levelFilename;
-	public final int NUMBER_OF_LEVELS = 2;
+	public final int NUMBER_OF_LEVELS = 3;
 	public int levelNum;
 	public Level level;
 	public Player player = new Player();
@@ -29,6 +35,10 @@ public class GamePanel extends JPanel {
 	public Color brown = new Color(94, 48, 0);
 	private int timer = 0;
 	
+	/**
+	 * constructor
+	 * sets hud element values
+	 */
 	public GamePanel(Client c){
 		setPreferredSize(new Dimension(600,400+HUD_LENGTH));
 		titleBox = new Rectangle(260, 133, 71, 25);
@@ -432,6 +442,14 @@ public class GamePanel extends JPanel {
 		repaint();
 	}
 
+	/**
+	 * determines the number of objects of a certain type that should be loaded
+	 * into the game
+	 * @param reader the reader that reads the data defining the objects that
+	 * should be loaded into the level
+	 * @return the number of objects of a certain type that should be loaded
+	 * into the level
+	 */
 	private int countObjects(BufferedReader reader) {
 		int count = 0;
 		try{

@@ -310,7 +310,7 @@ public class GamePanel extends JPanel {
 					try{
 						reader = new BufferedReader(new FileReader(levelContent));
 					}catch(FileNotFoundException e){
-						System.out.println("cannot find file: "+levelFilename);
+						System.out.println("cannot find file: "+levelContent.getAbsolutePath());
 						System.exit(0);
 					}
 					//Retrieve player start position data from file

@@ -2,6 +2,7 @@ package FightGame;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import javax.swing.*;
@@ -305,7 +306,14 @@ public class GamePanel extends JPanel {
 					level = new Level(HUD_LENGTH);
 					//open the level file
 					levelFilename = "level" + levelNum;
-					File levelContent = new File("src\\FightGame\\"+levelFilename);
+					ClassLoader cl = ClassLoader.getSystemClassLoader();
+					File levelContent = null;
+					try {
+						levelContent = new File(cl.getResource("FightGame\\"+levelFilename).toURI());
+					} catch (URISyntaxException e1) {
+						System.out.println("cannot convert to URI: "+"FightGame\\"+levelFilename);
+						System.exit(0);
+					}
 					BufferedReader reader = null;
 					try{
 						reader = new BufferedReader(new FileReader(levelContent));
